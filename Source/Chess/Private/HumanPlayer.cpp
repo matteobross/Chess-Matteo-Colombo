@@ -21,8 +21,8 @@ AHumanPlayer::AHumanPlayer()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	//Setto la camera come Root Component
 	SetRootComponent(Camera);
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Casto la game instance
-	GameInstance = Cast<Chess_GameInstance.h>(UGameplayStatics::GetGameInstance(GetWorld()));
+	// Casto la game instance
+	GameInstance = Cast<UChess_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	// default init values
 	//PlayerNumber = -1;
 	//Sign = ESign::E;
@@ -61,15 +61,15 @@ GameInstance->SetTurnMessage(TEXT("Human Turn"));
 void AHumanPlayer::OnWin()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Win!"));
-	//GameInstance->SetTurnMessage(TEXT("Human Wins!"));
-	//GameInstance->IncrementScoreHumanPlayer();
+	GameInstance->SetTurnMessage(TEXT("Human Wins!"));
+	GameInstance->IncrementScoreHumanPlayer();
 
 }
 
 void AHumanPlayer::OnLose()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("You Lose!"));
-	//GameInstance->SetTurnMessage(TEXT("Human Loses!"));
+	GameInstance->SetTurnMessage(TEXT("Human Loses!"));
 }
 
 void AHumanPlayer::OnClick()

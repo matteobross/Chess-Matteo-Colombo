@@ -4,6 +4,7 @@
 #include "GameField.h"
 #include <GameMapsSettings.h>
 #include <AI/NavigationSystemBase.h>
+#include "ChessPawn.h"
 #include "Chess_gamemode.h"
 
 
@@ -13,13 +14,17 @@ AGameField::AGameField()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
+	//Per la scacchiera visibile
+	BoardSize = 8;
+	CellSize = 120;
+
 	
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!size of winnning line
 	WinSize = 3;
-	// size of the field (3x3)                       DA METTERE PARI E DIPARI PER SCACCHIRA
-	Size = 3;
+	// scacchiera 8x8                       DA METTERE PARI E DIPARI PER SCACCHIRA
+	Size = BoardSize;
 	// dimensione tile
-	TileSize = 120;
+	TileSize = CellSize;
 	// Spazio tra letile
 	CellPadding = 20;
 }
@@ -36,6 +41,16 @@ void AGameField::BeginPlay()
 {
 	Super::BeginPlay();
 	GenerateField();
+	CreateChessBoard();
+
+//Per far spawnare i pedoni solo nei punti iniziali
+	for (int32 Row = 0; Row < BoardSize; ++Row)
+	{
+		for (int32 Column = 0; Column < BoardSize; ++Column)
+		{
+			SpawnPawn(Row, Column);
+		}
+	}
 }
 
 void AGameField::ResetField()
@@ -52,7 +67,7 @@ void AGameField::ResetField()
 	GameMode->ChoosePlayerAndStartGame();
 }
 
-//Da cambiare con scacchiera
+//Tile è la griglia dove venono salvate le posizioni.
 void AGameField::GenerateField() 
 {
 	for (int32 x = 0; x < Size; x++)
@@ -69,6 +84,9 @@ void AGameField::GenerateField()
 		}
 	}
 }
+
+//Creazione della scacchiera visibile è dopo
+
 
 FVector2D AGameField::GetPosition(const FHitResult& Hit)
 {
@@ -92,8 +110,51 @@ FVector2D AGameField::GetXYPositionByRelativeLocation(const FVector& Location) c
 	return FVector2D(x,y);
 }
 
+bool AGameField::IsWinPosition(const FVector2D Position) const
+{
+	//condizione vittoria degli scacchi
+	return false;
+}
+
 //POi da aggiungere ci sono tutte le condizioni di vittoria
 
+
+void AGameField::CreateChessBoard()
+{
+
+	{
+		// Loop through rows and columns to create the chessboard
+		for (int32 Row = 0; Row < BoardSize; ++Row)
+		{
+			for (int32 Col = 0; Col < BoardSize; ++Col)
+			{
+				// Calculate the location of the cell
+				FVector CellLocation = FVector(Col * CellSize, Row * CellSize, 0.0f);
+
+				// Create a static mesh component for the cell
+				UStaticMeshComponent* CellMesh = NewObject<UStaticMeshComponent>(this);
+				CellMesh->SetStaticMesh(LoadObject<UStaticMesh>(nullptr, TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'")));
+				CellMesh->SetWorldLocation(CellLocation);
+				CellMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
+
+				// Apply alternating materials based on row and column
+				UMaterial* CellMaterial = (Row + Col) % 2 == 0 ? WhiteMaterial : BlackMaterial;
+				CellMesh->SetMaterial(0, CellMaterial);
+			}
+		}
+	}
+}
+
+//Per far spawnare i pedoni
+void AGameField::SpawnPawn(int32 Row, int32 Column)
+{
+	// Calculate the location for the pawn based on the row and column
+	FVector SpawnLocation = FVector(TileSize * Column, TileSize * Row, 0.0f);
+
+	// Spawn the pawn
+	AChessPawn* NewPawn = GetWorld()->SpawnActor<AChessPawn>(AChessPawn::StaticClass(), SpawnLocation, FRotator::ZeroRotator);
+	if (NewPawn)
+}
 
 // Called every frame
 void AGameField::Tick(float DeltaTime)

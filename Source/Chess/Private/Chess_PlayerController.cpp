@@ -3,6 +3,7 @@
 
 #include "Chess_PlayerController.h"
 #include "Components/InputComponent.h"
+#include <EnhancedInputSubsystems.h>
 
 
 
@@ -37,6 +38,6 @@ void AChess_PlayerController::SetupInputComponent()
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
 	{
-		//!!!!!!!!!EnhancedInputComponent->BindAction(ClickAction, ETriggerEvent::Triggered, this, &ATTT_PlayerController::ClickOnGrid);
+		EnhancedInputComponent->BindAction(ClickAction, ETriggerEvent::Triggered, this, &AChess_PlayerController::ClickOnGrid);
 	}
 }

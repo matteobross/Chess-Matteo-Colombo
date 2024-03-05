@@ -11,14 +11,16 @@ ATile::ATile()
 	PrimaryActorTick.bCanEverTick = false;
 
 
+
+	//Non mi servono perchè defisico la scacchiera con cubi direttamente da codice
 	//definisco Scene e Component
-	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
-	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
+	//Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
+	//StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	
 	
 	//Root component 
 	SetRootComponent(Scene);
-	StaticMeshComponent->SetupAttachment(Scene);
+	//StaticMeshComponent->SetupAttachment(Scene);
 
 	Status = ETileStatus::EMPTY;
 	PlayerOwner = -1;

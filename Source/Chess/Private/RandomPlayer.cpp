@@ -1,15 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
-#include "RandomPlayer.h"
 #include <Tile.h>
+#include <Engine/GameEngine.h>
+#include "Chess_GameInstance.h"
+#include "RandomPlayer.h"
+
+
 
 // Sets default values
 ARandomPlayer::ARandomPlayer()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!GameInstance = Cast<UTTT_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	//perchè non mi dichiara Gameinstance?
+	GameInstance = Cast<UChess_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 }
 
 // Called when the game starts or when spawned
@@ -43,10 +47,10 @@ void ARandomPlayer::OnTurn()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&]()
 		{
 			TArray<ATile*> FreeCells;
-		//  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!	ATTT_GameMode* GameMode = (ATTT_GameMode*)(GetWorld()->GetAuthGameMode());
-			//for (auto& CurrTile : GameMode->GField->GetTileArray())
+			AChess_GameMode* GameMode = (AChess_GameMode*)(GetWorld()->GetAuthGameMode());
+			for (auto& CurrTile : GameMode->GField->GetTileArray())
 			{
-				//if (CurrTile->GetTileStatus() == ETileStatus::EMPTY)
+				if (CurrTile->GetTileStatus() == ETileStatus::EMPTY)
 				{
 					FreeCells.Add(CurrTile);
 				}

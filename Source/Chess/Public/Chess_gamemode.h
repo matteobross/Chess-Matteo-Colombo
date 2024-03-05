@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
+#include "GameField.h"
+#include "PlayerInterface.h"
 #include "Chess_gamemode.generated.h"
 
 /**
@@ -16,8 +18,8 @@ class CHESS_API AChess_gamemode : public AGameStateBase
 public:
 	// Partita Finita
 	bool IsGameOver;
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Manca la I Player Interface
-	TArray<ITTT_PlayerInterface*> Players;
+	//player da Player Interface
+	TArray<IPlayerInterface*> Players;
 
 	//Dichiaro le variabili per il giocatore e per il numero di mosse
 	int32 CurrentPlayer;
@@ -27,7 +29,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AGameField> GameFieldClass;
 
-	// !!!!!!!!!!!!!!!!!!Grandezza della scacchiera
+	// Grandezza della scacchiera
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 FieldSize;
 
@@ -55,7 +57,7 @@ public:
 	// Sceglie un giocatore alla partenza
 	void ChoosePlayerAndStartGame();
 
-	// set the cell sign and the position 
+	// SET cell sign e position 
 	void SetCellSign(const int32 PlayerNumber, const FVector& SpawnPosition);
 
 	// Prendi il giocatore nuovo

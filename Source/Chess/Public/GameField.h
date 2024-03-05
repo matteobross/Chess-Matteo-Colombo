@@ -2,6 +2,7 @@
 
 #pragma once
 
+
 #include "Tile.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
@@ -81,20 +82,40 @@ public:
 	FVector2D GetXYPositionByRelativeLocation(const FVector& Location) const;
 /// 
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Controllo mossa vincente
-//	bool IsWinPosition(const FVector2D Position) const;
+	bool IsWinPosition(const FVector2D Position) const;
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!check if is a win line
-//	inline bool IsWinLine(const FVector2D Begin, const FVector2D End) const;
+	inline bool IsWinLine(const FVector2D Begin, const FVector2D End) const;
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!checking if is a valid field position
-//	inline bool IsValidPosition(const FVector2D Position) const;
+	inline bool IsValidPosition(const FVector2D Position) const;
 
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! get a line given a begin and end positions
-//	TArray<int32> GetLine(const FVector2D Begin, const FVector2D End) const;
+TArray<int32> GetLine(const FVector2D Begin, const FVector2D End) const;
 
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! check if a line contains all equal elements
-//	bool AllEqual(const TArray<int32>& Array) const;
+	bool AllEqual(const TArray<int32>& Array) const;
 
+	//Creazioen scacchiera visibile
+	 
+	// Dimensione scacchiera
+	int32 BoardSize;
+
+	// Tile della scacchiera
+	float CellSize;
+
+	// Mateiaale celle bianche
+	UPROPERTY(EditAnywhere)
+	UMaterial* WhiteMaterial;
+
+	// Materiale celle nere
+	UPROPERTY(EditAnywhere)
+	UMaterial* BlackMaterial;
+
+	void CreateChessBoard();
+
+	//Per far spawnare i pedoni (già in posizione)
+	void SpawnPawn(int32 Row, int32 Column);
 
 public:	
 	// Called every frame

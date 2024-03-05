@@ -14,7 +14,7 @@ enum class ETileStatus : uint8
 	OCCUPIED      UMETA(DisplayName = "Occupied"),
 };
 
-
+//Ho tolto il materiale delle tile perchè ho creato una scacchiera visibile dentro GameField
 
 UCLASS()
 class CHESS_API ATile : public AActor
@@ -48,8 +48,8 @@ protected:
 	USceneComponent* Scene;
 
 	//Per poter aggiungere il materiale
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UStaticMeshComponent* StaticMeshComponent;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	//UStaticMeshComponent* StaticMeshComponent;
 
 
 	//Status e PlayerOwner devono poter essere viste da tutti
