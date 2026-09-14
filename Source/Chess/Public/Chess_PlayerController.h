@@ -2,14 +2,13 @@
 
 #pragma once
 
-#include "EnhancedInputDeveloperSettings.h"
-#include "InputAction.h"
 #include "CoreMinimal.h"
 #include "HumanPlayer.h"
 #include "InputActionValue.h"
+#include "InputMappingContext.h"
+#include "InputAction.h"
 #include "GameFramework/PlayerController.h"
 #include "EnhancedInputComponent.h"
-//#include "EnhancedInputSubsystems.h
 #include "Chess_PlayerController.generated.h"
 
 
@@ -29,6 +28,13 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* ClickAction;
+
+	void ClickOnGrid();
+
+protected:
+	virtual void BeginPlay() override;
+	virtual void SetupInputComponent() override;
+};
 
 	void ClickOnGrid();
 
