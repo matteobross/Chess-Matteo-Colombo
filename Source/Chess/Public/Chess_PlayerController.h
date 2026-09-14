@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "../../../../../../../../Program Files/Epic Games/UE_5.2/Engine/Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputDeveloperSettings.h"
-#include "../../../../../../../../Program Files/Epic Games/UE_5.2/Engine/Plugins/EnhancedInput/Source/EnhancedInput/Public/InputAction.h"
+#include "EnhancedInputDeveloperSettings.h"
+#include "InputAction.h"
 #include "CoreMinimal.h"
 #include "HumanPlayer.h"
 #include "InputActionValue.h"
