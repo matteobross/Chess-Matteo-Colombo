@@ -18,7 +18,7 @@ AGameField::AGameField()
 	BoardSize = 8;
 	CellSize = 120;
 
-	// dimensione della linea vincente
+	// dimensione della linea vincente (quanti pezzi allineati servono per vincere)
 	WinSize = 3;
 	// scacchiera 8x8
 	Size = BoardSize;
@@ -108,9 +108,125 @@ FVector2D AGameField::GetXYPositionByRelativeLocation(const FVector& Location) c
 	return FVector2D(x,y);
 }
 
+bool AGameField::IsValidPosition(const FVector2D Position) const
+{
+	const int32 X = FMath::RoundToInt(Position.X);
+	const int32 Y = FMath::RoundToInt(Position.Y);
+	return X >= 0 && X < Size && Y >= 0 && Y < Size;
+}
+
+TArray<int32> AGameField::GetLine(const FVector2D Begin, const FVector2D End) const
+{
+	// Legge la sequenza di "owner" delle tile lungo la linea retta da Begin a End
+	// (Begin/End devono essere sulla stessa riga, colonna o diagonale).
+	TArray<int32> Line;
+
+	const int32 BeginX = FMath::RoundToInt(Begin.X);
+	const int32 BeginY = FMath::RoundToInt(Begin.Y);
+	const int32 EndX = FMath::RoundToInt(End.X);
+	const int32 EndY = FMath::RoundToInt(End.Y);
+
+	const int32 StepX = FMath::Sign(EndX - BeginX);
+	const int32 StepY = FMath::Sign(EndY - BeginY);
+	const int32 Steps = FMath::Max(FMath::Abs(EndX - BeginX), FMath::Abs(EndY - BeginY));
+
+	int32 CurrentX = BeginX;
+	int32 CurrentY = BeginY;
+
+	for (int32 i = 0; i <= Steps; i++)
+	{
+		const FVector2D Current(CurrentX, CurrentY);
+
+		if (!IsValidPosition(Current))
+		{
+			return TArray<int32>();
+		}
+
+		if (ATile* const* FoundTile = TileMap.Find(Current))
+		{
+			Line.Add((*FoundTile)->GetOwner());
+		}
+		else
+		{
+			return TArray<int32>();
+		}
+
+		CurrentX += StepX;
+		CurrentY += StepY;
+	}
+
+	return Line;
+}
+
+bool AGameField::AllEqual(const TArray<int32>& Array) const
+{
+	if (Array.Num() == 0)
+	{
+		return false;
+	}
+
+	const int32 FirstOwner = Array[0];
+	// NOT_ASSIGNED significa "tile vuota": una linea di caselle vuote non e' una linea vincente
+	if (FirstOwner == NOT_ASSIGNED)
+	{
+		return false;
+	}
+
+	for (const int32 Owner : Array)
+	{
+		if (Owner != FirstOwner)
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool AGameField::IsWinLine(const FVector2D Begin, const FVector2D End) const
+{
+	if (!IsValidPosition(Begin) || !IsValidPosition(End))
+	{
+		return false;
+	}
+
+	return AllEqual(GetLine(Begin, End));
+}
+
 bool AGameField::IsWinPosition(const FVector2D Position) const
 {
-	// TODO: implementare la vera condizione di vittoria degli scacchi
+	// Controlla se l'ultima pedina piazzata in Position fa parte di una linea
+	// di WinSize pedine dello stesso giocatore, in una delle 4 direzioni possibili:
+	// orizzontale, verticale, diagonale principale, diagonale secondaria.
+	const FVector2D RoundedPosition(FMath::RoundToInt(Position.X), FMath::RoundToInt(Position.Y));
+
+	if (!IsValidPosition(RoundedPosition))
+	{
+		return false;
+	}
+
+	const TArray<FVector2D> Directions = {
+		FVector2D(1, 0),
+		FVector2D(0, 1),
+		FVector2D(1, 1),
+		FVector2D(1, -1)
+	};
+
+	for (const FVector2D& Dir : Directions)
+	{
+		// Fa scorrere una finestra di WinSize caselle lungo la direzione, passante per Position
+		for (int32 Offset = -(WinSize - 1); Offset <= 0; Offset++)
+		{
+			const FVector2D Begin = RoundedPosition + Dir * Offset;
+			const FVector2D End = RoundedPosition + Dir * (Offset + WinSize - 1);
+
+			if (IsWinLine(Begin, End))
+			{
+				return true;
+			}
+		}
+	}
+
 	return false;
 }
 
