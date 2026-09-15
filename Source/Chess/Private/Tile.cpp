@@ -7,20 +7,13 @@
 ATile::ATile()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	//Non mi serve il tick
+	// Non serve il tick per una tile statica
 	PrimaryActorTick.bCanEverTick = false;
 
-
-
-	//Non mi servono perchè defisico la scacchiera con cubi direttamente da codice
-	//definisco Scene e Component
-	//Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
-	//StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
-	
-	
-	//Root component 
+	// La scacchiera visibile viene disegnata da GameField, quindi la Tile ha
+	// bisogno solo di una Scene component come root, per posizione e scala.
+	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
 	SetRootComponent(Scene);
-	//StaticMeshComponent->SetupAttachment(Scene);
 
 	Status = ETileStatus::EMPTY;
 	PlayerOwner = -1;
@@ -59,5 +52,3 @@ void ATile::BeginPlay()
 	Super::BeginPlay();
 	
 }
-
-
