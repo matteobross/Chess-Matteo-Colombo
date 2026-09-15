@@ -18,14 +18,13 @@ AGameField::AGameField()
 	BoardSize = 8;
 	CellSize = 120;
 
-	
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!size of winnning line
+	// dimensione della linea vincente
 	WinSize = 3;
-	// scacchiera 8x8                       DA METTERE PARI E DIPARI PER SCACCHIRA
+	// scacchiera 8x8
 	Size = BoardSize;
 	// dimensione tile
 	TileSize = CellSize;
-	// Spazio tra letile
+	// Spazio tra le tile
 	CellPadding = 20;
 }
 
@@ -43,7 +42,7 @@ void AGameField::BeginPlay()
 	GenerateField();
 	CreateChessBoard();
 
-//Per far spawnare i pedoni solo nei punti iniziali
+	//Per far spawnare i pedoni solo nei punti iniziali
 	for (int32 Row = 0; Row < BoardSize; ++Row)
 	{
 		for (int32 Column = 0; Column < BoardSize; ++Column)
@@ -59,15 +58,17 @@ void AGameField::ResetField()
 	{
 		Obj->SetTileStatus(NOT_ASSIGNED, ETileStatus::EMPTY);
 	}
-	//qui ci sarebbe da mettere il messaggio broadcast per resettare
-	
-	AChess_gamemode* GameMode = Cast<AChess_gamemode>(GetWorld()->GetAuthGameMode()); 
-	GameMode->IsGameOver = false;
-	GameMode->MoveCounter = 0;
-	GameMode->ChoosePlayerAndStartGame();
+
+	AChess_gamemode* GameMode = GetWorld()->GetGameState<AChess_gamemode>();
+	if (GameMode)
+	{
+		GameMode->IsGameOver = false;
+		GameMode->MoveCounter = 0;
+		GameMode->ChoosePlayerAndStartGame();
+	}
 }
 
-//Tile è la griglia dove venono salvate le posizioni.
+//Tile e' la griglia dove vengono salvate le posizioni.
 void AGameField::GenerateField() 
 {
 	for (int32 x = 0; x < Size; x++)
@@ -84,9 +85,6 @@ void AGameField::GenerateField()
 		}
 	}
 }
-
-//Creazione della scacchiera visibile è dopo
-
 
 FVector2D AGameField::GetPosition(const FHitResult& Hit)
 {
@@ -112,35 +110,29 @@ FVector2D AGameField::GetXYPositionByRelativeLocation(const FVector& Location) c
 
 bool AGameField::IsWinPosition(const FVector2D Position) const
 {
-	//condizione vittoria degli scacchi
+	// TODO: implementare la vera condizione di vittoria degli scacchi
 	return false;
 }
 
-//POi da aggiungere ci sono tutte le condizioni di vittoria
-
-
 void AGameField::CreateChessBoard()
 {
-
+	// Loop through rows and columns to create the chessboard
+	for (int32 Row = 0; Row < BoardSize; ++Row)
 	{
-		// Loop through rows and columns to create the chessboard
-		for (int32 Row = 0; Row < BoardSize; ++Row)
+		for (int32 Col = 0; Col < BoardSize; ++Col)
 		{
-			for (int32 Col = 0; Col < BoardSize; ++Col)
-			{
-				// Calculate the location of the cell
-				FVector CellLocation = FVector(Col * CellSize, Row * CellSize, 0.0f);
+			// Calculate the location of the cell
+			FVector CellLocation = FVector(Col * CellSize, Row * CellSize, 0.0f);
 
-				// Create a static mesh component for the cell
-				UStaticMeshComponent* CellMesh = NewObject<UStaticMeshComponent>(this);
-				CellMesh->SetStaticMesh(LoadObject<UStaticMesh>(nullptr, TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'")));
-				CellMesh->SetWorldLocation(CellLocation);
-				CellMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
+			// Create a static mesh component for the cell
+			UStaticMeshComponent* CellMesh = NewObject<UStaticMeshComponent>(this);
+			CellMesh->SetStaticMesh(LoadObject<UStaticMesh>(nullptr, TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'")));
+			CellMesh->SetWorldLocation(CellLocation);
+			CellMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
 
-				// Apply alternating materials based on row and column
-				UMaterial* CellMaterial = (Row + Col) % 2 == 0 ? WhiteMaterial : BlackMaterial;
-				CellMesh->SetMaterial(0, CellMaterial);
-			}
+			// Apply alternating materials based on row and column
+			UMaterial* CellMaterial = (Row + Col) % 2 == 0 ? WhiteMaterial : BlackMaterial;
+			CellMesh->SetMaterial(0, CellMaterial);
 		}
 	}
 }
@@ -154,12 +146,13 @@ void AGameField::SpawnPawn(int32 Row, int32 Column)
 	// Spawn the pawn
 	AChessPawn* NewPawn = GetWorld()->SpawnActor<AChessPawn>(AChessPawn::StaticClass(), SpawnLocation, FRotator::ZeroRotator);
 	if (NewPawn)
+	{
+		// TODO: eventuale inizializzazione del pedone appena spawnato (tipo di pezzo, proprietario, ecc.)
+	}
 }
 
 // Called every frame
 void AGameField::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
-
