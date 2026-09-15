@@ -3,6 +3,7 @@
 
 #include "Chess_gamemode.h"
 #include "Chess_PlayerController.h"
+#include "RandomPlayer.h"
 #include "EngineUtils.h"
 
 AChess_gamemode::AChess_gamemode()
@@ -15,11 +16,11 @@ AChess_gamemode::AChess_gamemode()
 void AChess_gamemode::BeginPlay()
 {
 	IsGameOver = false;
-
 	MoveCounter = 0;
 
 	AHumanPlayer* HumanPlayer = Cast<AHumanPlayer>(*TActorIterator<AHumanPlayer>(GetWorld()));
-	
+	ARandomPlayer* AI = Cast<ARandomPlayer>(*TActorIterator<ARandomPlayer>(GetWorld()));
+
 	if (GameFieldClass != nullptr)
 	{
 		GField = GetWorld()->SpawnActor<AGameField>(GameFieldClass);
@@ -34,11 +35,8 @@ void AChess_gamemode::BeginPlay()
 	FVector CameraPos(CameraPosX, CameraPosX, 1000.0f);
 	HumanPlayer->SetActorLocationAndRotation(CameraPos, FRotationMatrix::MakeFromX(FVector(0, 0, -1)).Rotator());
 
-
 	// Da ricordarsi che il giocatore umano = 0
 	Players.Add(HumanPlayer);
-	
-
 
 	// AI player = 1
 	Players.Add(AI);
@@ -64,55 +62,39 @@ void AChess_gamemode::SetCellSign(const int32 PlayerNumber, const FVector& Spawn
 	if (IsGameOver || PlayerNumber != CurrentPlayer)
 	{
 		return;
+	}
 
-		UClass* SignActor = Players[CurrentPlayer]->Sign == ESign::X ? SignXActor : SignOActor;
-		FVector Location = GField->GetActorLocation() + SpawnPosition + FVector(0, 0, 10);
-		GetWorld()->SpawnActor(SignActor, &Location);
-		//ancora da inserire condizione vittoria degli scachi
-		if (GField->IsWinPosition(GField->GetXYPositionByRelativeLocation(SpawnPosition)))
+	UClass* SignActor = Players[CurrentPlayer]->Sign == ESign::X ? SignXActor : SignOActor;
+	FVector Location = GField->GetActorLocation() + SpawnPosition + FVector(0, 0, 10);
+	GetWorld()->SpawnActor(SignActor, &Location);
+
+	// TODO: implementare la vera condizione di vittoria degli scacchi (per ora IsWinPosition ritorna sempre false)
+	if (GField->IsWinPosition(GField->GetXYPositionByRelativeLocation(SpawnPosition)))
+	{
+		IsGameOver = true;
+		Players[CurrentPlayer]->OnWin();
+		for (int32 i = 0; i < Players.Num(); i++)
 		{
-			IsGameOver = true;
-			Players[CurrentPlayer]->OnWin();
-			for (int32 i = 0; i < Players.Num(); i++)
+			if (i != CurrentPlayer)
 			{
-				if (i != CurrentPlayer)
-				{
-					Players[i]->OnLose();
-				}
+				Players[i]->OnLose();
 			}
 		}
-		else if (MoveCounter == (FieldSize * FieldSize))
-		{
-			// add a timer (3 seconds)
-			FTimerHandle TimerHandle;
-
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&]()
-				{
-					// function to delay
-					GField->ResetField();
-				}, 3, false);
-		}
-		else
-		{
-			TurnNextPlayer();
-		}
-
-
-}
-	;;
-
-	//NON SO IL PERCHè SE CANCELLO QUESTA NON FUNZIONA QUELLA SOOT, SARà UNA COSADELLE PARENTESI
-int32 AChess_gamemode::GetNextPlayer(int32 Player)
-{
-Player++;
-	if (!Players.IsValidIndex(Player))
-	{
-		Player = 0;
 	}
-	return Player;
+	else if (MoveCounter == (FieldSize * FieldSize))
+	{
+		// Pareggio: aspetta 3 secondi e poi resetta il campo
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+			{
+				GField->ResetField();
+			}, 3, false);
+	}
+	else
+	{
+		TurnNextPlayer();
+	}
 }
-
-
 
 void AChess_gamemode::TurnNextPlayer()
 {
@@ -120,7 +102,6 @@ void AChess_gamemode::TurnNextPlayer()
 	CurrentPlayer = GetNextPlayer(CurrentPlayer);
 	Players[CurrentPlayer]->OnTurn();
 }
-
 
 int32 AChess_gamemode::GetNextPlayer(int32 Player)
 {
