@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Tile.generated.h"
 
-//Numerativo per dirmi se la tile è libera o occupata
+//Numerativo per dirmi se la tile e' libera o occupata
 UENUM()
 enum class ETileStatus : uint8
 {
@@ -14,7 +14,7 @@ enum class ETileStatus : uint8
 	OCCUPIED      UMETA(DisplayName = "Occupied"),
 };
 
-//Ho tolto il materiale delle tile perchè ho creato una scacchiera visibile dentro GameField
+//Ho tolto il materiale delle tile perche' ho creato una scacchiera visibile dentro GameField
 
 UCLASS()
 class CHESS_API ATile : public AActor
@@ -28,17 +28,17 @@ public:
 	// SET player owner e status 
 	void SetTileStatus(const int32 TileOwner, const ETileStatus TileStatus);
 
-	// GET lo stato della tile (se c'è una pedina)
-	ETileStatus GetTileStatus();
+	// GET lo stato della tile (se c'e' una pedina)
+	ETileStatus GetTileStatus() const;
 
 	// Tile appartiene a 0 o 1
-	int32 GetOwner();
+	int32 GetOwner() const;
 
 	//SET posizione x,y della tile
 	void SetGridPosition(const double InX, const double InY);
 
 	//GET posizione x,y della tile
-	FVector2D GetGridPosition();
+	FVector2D GetGridPosition() const;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -46,11 +46,6 @@ protected:
 	//Per essere messo nell'editor 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USceneComponent* Scene;
-
-	//Per poter aggiungere il materiale
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	//UStaticMeshComponent* StaticMeshComponent;
-
 
 	//Status e PlayerOwner devono poter essere viste da tutti
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -62,11 +57,5 @@ protected:
 	//Due Float per posione (x,y)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FVector2D TileGridPosition;
-
-
-	//il tick è false
-//public:	
-	// Called every frame
-	//virtual void Tick(float DeltaTime) override;
 
 };
