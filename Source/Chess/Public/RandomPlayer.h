@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "PlayerInterface.h"
-//Da includere gameinstance e gamemode
 #include "GameFramework/Pawn.h"
 #include "Kismet/GameplayStatics.h"
+#include "Chess_GameInstance.h"
 #include "RandomPlayer.generated.h"
 
 UCLASS()
-class CHESS_API ARandomPlayer : public APawn
+class CHESS_API ARandomPlayer : public APawn, public IPlayerInterface
 {
 	GENERATED_BODY()
 
@@ -18,7 +18,9 @@ public:
 	// Sets default values for this pawn's properties
 	ARandomPlayer();
 
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!UTTT_GameInstance* GameInstance;
+	// game instance reference
+	UChess_GameInstance* GameInstance;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
