@@ -55,4 +55,4 @@ No license file yet — all rights reserved by default until one is added.
 
 ## Author
 
-Matteo Colombo
+Matteo Colombo, AI used for the readme
