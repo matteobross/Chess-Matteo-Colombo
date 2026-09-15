@@ -3,6 +3,7 @@
 #include <Tile.h>
 #include <Engine/GameEngine.h>
 #include "Chess_GameInstance.h"
+#include "Chess_gamemode.h"
 #include "RandomPlayer.h"
 
 
@@ -12,29 +13,27 @@ ARandomPlayer::ARandomPlayer()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	//perchè non mi dichiara Gameinstance?
-	GameInstance = Cast<UChess_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 }
 
 // Called when the game starts or when spawned
 void ARandomPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	// GetWorld() non e' affidabile nel costruttore: la GameInstance va presa qui
+	GameInstance = Cast<UChess_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 }
 
 // Called every frame
 void ARandomPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
 void ARandomPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 void ARandomPlayer::OnTurn()
@@ -44,10 +43,15 @@ void ARandomPlayer::OnTurn()
 
 	FTimerHandle TimerHandle;
 
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&]()
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
 		{
 			TArray<ATile*> FreeCells;
-			AChess_GameMode* GameMode = (AChess_GameMode*)(GetWorld()->GetAuthGameMode());
+			AChess_gamemode* GameMode = GetWorld()->GetGameState<AChess_gamemode>();
+			if (!GameMode)
+			{
+				return;
+			}
+
 			for (auto& CurrTile : GameMode->GField->GetTileArray())
 			{
 				if (CurrTile->GetTileStatus() == ETileStatus::EMPTY)
@@ -63,7 +67,6 @@ void ARandomPlayer::OnTurn()
 				FreeCells[RandIdx]->SetTileStatus(PlayerNumber, ETileStatus::OCCUPIED);
 
 				GameMode->SetCellSign(PlayerNumber, Location);
-
 			}
 		}, 3, false);
 }
@@ -78,6 +81,5 @@ void ARandomPlayer::OnWin()
 void ARandomPlayer::OnLose()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("AI (Random) Loses!"));
-	 GameInstance->SetTurnMessage(TEXT("AI Loses!"));
+	GameInstance->SetTurnMessage(TEXT("AI Loses!"));
 }
-
